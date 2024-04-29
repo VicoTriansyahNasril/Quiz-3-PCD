@@ -79,6 +79,47 @@ def grayscale():
     return render_template("uploaded.html", file_path="img/img_now.jpg")
 
 
+@app.route("/binary", methods=["POST"])
+@nocache
+def binary():
+    image_processing.binary_image(128)
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+
+@app.route("/erosion", methods=["POST"])
+@nocache
+def erosion():
+    image_processing.erosion()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+
+@app.route("/dilation", methods=["POST"])
+@nocache
+def dilation():
+    image_processing.dilation()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+@app.route("/opening", methods=["POST"])
+@nocache
+def opening():
+    image_processing.opening()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+
+@app.route("/closing", methods=["POST"])
+@nocache
+def closing():
+    image_processing.closing()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+
+@app.route("/count", methods=["POST"])
+@nocache
+def count():
+    num_objects = image_processing.count_shattered_glass()
+    return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
+
+
 @app.route("/zoomin", methods=["POST"])
 @nocache
 def zoomin():

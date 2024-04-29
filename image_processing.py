@@ -4,13 +4,80 @@ import matplotlib.pyplot as plt
 from collections import Counter
 import cv2
 
+
 def grayscale():
     img = Image.open("static/img/img_now.jpg")
     img_arr = np.array(img)
-    r, g, b = img_arr[:,:,0], img_arr[:,:,1], img_arr[:,:,2]
-    new_arr = ((r.astype(int) + g.astype(int) + b.astype(int)) // 3).astype(np.uint8)
+    r, g, b = img_arr[:, :, 0], img_arr[:, :, 1], img_arr[:, :, 2]
+    new_arr = ((r.astype(int) + g.astype(int) +
+               b.astype(int)) // 3).astype(np.uint8)
     new_img = Image.fromarray(new_arr)
     new_img.save("static/img/img_now.jpg")
+
+
+def binary_image(threshold_value):
+    img = Image.open("static/img/img_now.jpg")
+    img_arr = np.asarray(img).copy()
+    img_arr = cv2.cvtColor(img_arr, cv2.COLOR_RGB2GRAY)
+    _, binary_img = cv2.threshold(
+        img_arr, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    new_img = Image.fromarray(binary_img)
+    new_img.save("static/img/img_now.jpg")
+
+
+def erosion():
+    img = Image.open("static/img/img_now.jpg")
+    kernel = np.ones((5, 5), np.uint8)
+    eroded_img = cv2.erode(np.array(img), kernel, iterations=1)
+    new_img = Image.fromarray(eroded_img)
+    new_img.save("static/img/img_now.jpg")
+
+
+def dilation():
+    img = Image.open("static/img/img_now.jpg")
+    kernel = np.ones((5, 5), np.uint8)
+    dilated_img = cv2.dilate(np.array(img), kernel, iterations=1)
+    new_img = Image.fromarray(dilated_img)
+    new_img.save("static/img/img_now.jpg")
+
+
+def opening():
+    img = Image.open("static/img/img_now.jpg")
+    kernel = np.ones((5, 5), np.uint8)
+    opened_img = cv2.morphologyEx(np.array(img), cv2.MORPH_OPEN, kernel)
+    new_img = Image.fromarray(opened_img)
+    new_img.save("static/img/img_now.jpg")
+
+def closing():
+    open_img = Image.open("static/img/img_now.jpg")
+    kernel = np.ones((5, 5), np.uint8)
+    closed_img = cv2.morphologyEx(np.array(open_img), cv2.MORPH_CLOSE, kernel)
+    new_img = Image.fromarray(closed_img)
+    new_img.save("static/img/img_now.jpg")
+
+def count_shattered_glass():
+    img = Image.open("static/img/img_now.jpg").convert('L')
+    img_np = np.array(img)
+    img_blur = cv2.GaussianBlur(img_np, (5, 5), 0)
+    _, thresh = cv2.threshold(img_blur, 0, 255, cv2.THRESH_OTSU)
+    kernel = np.ones((3, 3), np.uint8)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+    sure_bg = cv2.dilate(opening, kernel, iterations=1)
+    dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+    _, sure_fg = cv2.threshold(
+        dist_transform, 0.4*dist_transform.max(), 255, 0)
+    sure_fg = np.uint8(sure_fg)
+    unknown = cv2.subtract(sure_bg, sure_fg)
+
+    _, markers = cv2.connectedComponents(sure_fg)
+    markers = markers + 1
+    markers[unknown == 255] = 0
+    img_color = cv2.cvtColor(img_np, cv2.COLOR_GRAY2BGR)
+    markers = cv2.watershed(img_color, markers)
+
+    num_shattered_glass = len(np.unique(markers))
+    img_color[markers == -1] = [255, 0, 0]
+    return num_shattered_glass
 
 
 def is_grey_scale(img_path):
@@ -159,7 +226,8 @@ def convolution(img, kernel):
     h_kernel, w_kernel = kernel.shape
     pad_height = h_kernel // 2
     pad_width = w_kernel // 2
-    padded_img = np.pad(img, ((pad_height, pad_height), (pad_width, pad_width), (0, 0)), mode='constant')
+    padded_img = np.pad(img, ((pad_height, pad_height),
+                        (pad_width, pad_width), (0, 0)), mode='constant')
 
     new_img = np.zeros_like(img)
 
@@ -218,15 +286,15 @@ def histogram_rgb():
         data_r = Counter(r)
         data_g = Counter(g)
         data_b = Counter(b)
-        
+
         plt.bar(list(data_r.keys()), data_r.values(), color='red')
         plt.savefig(f'static/img/red_histogram.jpg', dpi=300)
         plt.clf()
-        
+
         plt.bar(list(data_g.keys()), data_g.values(), color='green')
         plt.savefig(f'static/img/green_histogram.jpg', dpi=300)
         plt.clf()
-        
+
         plt.bar(list(data_b.keys()), data_b.values(), color='blue')
         plt.savefig(f'static/img/blue_histogram.jpg', dpi=300)
         plt.clf()
@@ -264,7 +332,7 @@ def histogram_equalizer():
     image_equalized = np.interp(img, range(0, 256), my_cdf)
     cv2.imwrite('static/img/img_now.jpg', image_equalized)
     # Plot and save histogram after equalization
-    plt.hist(image_equalized.flatten(), bins=256, range=[0,256], color='gray')
+    plt.hist(image_equalized.flatten(), bins=256, range=[0, 256], color='gray')
     plt.savefig('static/img/equalized_histogram.jpg', dpi=300)
 
 
@@ -272,11 +340,13 @@ def threshold(lower_thres, upper_thres):
     img = Image.open("static/img/img_now.jpg")
     img_arr = np.array(img)
     if len(img_arr.shape) == 3:  # Color image
-        condition = np.logical_and.reduce((img_arr[:,:,0] >= lower_thres[0], img_arr[:,:,0] <= upper_thres[0],
-                                            img_arr[:,:,1] >= lower_thres[1], img_arr[:,:,1] <= upper_thres[1],
-                                            img_arr[:,:,2] >= lower_thres[2], img_arr[:,:,2] <= upper_thres[2]))
+        condition = np.logical_and.reduce((img_arr[:, :, 0] >= lower_thres[0], img_arr[:, :, 0] <= upper_thres[0],
+                                           img_arr[:, :, 1] >= lower_thres[1], img_arr[:,
+                                                                                       :, 1] <= upper_thres[1],
+                                           img_arr[:, :, 2] >= lower_thres[2], img_arr[:, :, 2] <= upper_thres[2]))
     else:  # Grayscale image
-        condition = np.logical_and(img_arr >= lower_thres, img_arr <= upper_thres)
+        condition = np.logical_and(
+            img_arr >= lower_thres, img_arr <= upper_thres)
     img_arr[condition] = 255
     new_img = Image.fromarray(img_arr)
     new_img.save("static/img/img_now.jpg")

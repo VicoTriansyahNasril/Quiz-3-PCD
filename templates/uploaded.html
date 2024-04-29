@@ -6,13 +6,14 @@
         <div class="col-md-2 p-0" style="overflow-y: auto; height: 100vh;">
             <!-- Menambahkan overflow-y dan height untuk membuat sidebar dapat di-scroll -->
             {% set sections = [
-                {'title': 'Umum', 'options': [('normal', 'Normal'), ('grayscale', 'Grayscale'), ('zoomin', 'Zoom In'), ('zoomout', 'Zoom Out')]},
+                {'title': 'Umum', 'options': [('normal', 'Normal'), ('grayscale', 'Grayscale'), ('binary', 'Binary'), ('zoomin', 'Zoom In'), ('zoomout', 'Zoom Out')]},
                 {'title': 'Pergeseran', 'options': [('move_left', 'Geser Kiri'), ('move_right', 'Geser Kanan'), ('move_up', 'Geser Atas'), ('move_down', 'Geser Bawah')]},
                 {'title': 'Penerangan', 'options': [('brightness_multiplication', 'Terang (*)'), ('brightness_division', 'Gelap (/)'), ('brightness_addition', 'Terang(+)'), ('brightness_substraction', 'Gelap (-)')]},
                 {'title': 'Analisis Gambar', 'options': [('histogram_rgb', 'Histogram')]},
                 {'title': 'Pemrosesan Gambar', 'options': [('histogram_equalizer', 'Histogram Equalizer')]},
-                {'title': 'Filter Gambar', 'options': [('edge_detection', 'Edge Detection'), ('blur', 'Blur'), ('sharpening', 'Sharpening')]},
-                {'title': 'Segmentation', 'options': [('thresholding', 'Thresholding')]}
+                {'title': 'Filter Gambar', 'options': [('edge_detection', 'Edge Detection'), ('blur', 'Blur'), ('sharpening', 'Sharpening'), ('erosion', 'Erosion'), ('dilation', 'Dilation'), ('opening', 'Opening'), ('closing', 'Closing')]},
+                {'title': 'Segmentation', 'options': [('thresholding', 'Thresholding')]},
+                {'title': 'Ngitung', 'options': [('count', 'Count Shattered Glass')]}
             ] %}
             {% for section in sections %}
                 <div class="p-2">

@@ -122,6 +122,12 @@ def count():
 @app.route("/countsquare", methods=["POST"])
 @nocache
 def countsquare():
+    num_objects = image_processing.count_square()
+    return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
+
+@app.route("/countcell", methods=["POST"])
+@nocache
+def countcell():
     num_objects = image_processing.count_objects()
     return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
 

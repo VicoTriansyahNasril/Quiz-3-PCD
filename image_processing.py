@@ -31,6 +31,22 @@ def count_objects():
     num_objects = len(contours)
     return num_objects
 
+def count_square():
+    # Baca citra sebagai citra keabuan (grayscale)
+    img_gray = cv2.imread('static/img/img_now.jpg', cv2.IMREAD_GRAYSCALE)
+    
+    # Lakukan thresholding untuk mendapatkan citra biner
+    _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)  # Ubah nilai threshold sesuai kebutuhan
+    
+    # Temukan kontur objek pada citra biner
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Hitung jumlah objek (kontur) yang ditemukan
+    num_objects = len(contours)
+    
+    return num_objects
+
+
 def erosion():
     img = Image.open("static/img/img_now.jpg")
     kernel = np.ones((5, 5), np.uint8)

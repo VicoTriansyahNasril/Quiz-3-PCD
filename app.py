@@ -119,6 +119,11 @@ def count():
     num_objects = image_processing.count_shattered_glass()
     return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
 
+@app.route("/countsquare", methods=["POST"])
+@nocache
+def countsquare():
+    num_objects = image_processing.count_objects()
+    return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
 
 @app.route("/zoomin", methods=["POST"])
 @nocache

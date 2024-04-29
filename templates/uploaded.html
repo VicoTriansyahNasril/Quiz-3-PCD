@@ -13,7 +13,7 @@
                 {'title': 'Pemrosesan Gambar', 'options': [('histogram_equalizer', 'Histogram Equalizer')]},
                 {'title': 'Filter Gambar', 'options': [('edge_detection', 'Edge Detection'), ('blur', 'Blur'), ('sharpening', 'Sharpening'), ('erosion', 'Erosion'), ('dilation', 'Dilation'), ('opening', 'Opening'), ('closing', 'Closing')]},
                 {'title': 'Segmentation', 'options': [('thresholding', 'Thresholding')]},
-                {'title': 'Ngitung', 'options': [('count', 'Count Shattered Glass')]}
+                {'title': 'Ngitung', 'options': [('count', 'Count Shattered Glass'), ('countsquare', 'Count Object(s)')]}
             ] %}
             {% for section in sections %}
                 <div class="p-2">
@@ -53,15 +53,26 @@
             {% endfor %}
         </div>
         <!-- Sidebar end -->
-
+        
         <!-- Content -->
-        <div class="col-md-10 h-100">
-            <div class="jumbotron jumbotron-fluid h-100">
-                <div class="container h-100">
-                    <div class="row h-100">
-                        <div class="col-lg-10">
-                            <h3>After</h3>
-                            <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
+        <div class="col-md-10">
+            <div class="container-fluid">
+                <div class="jumbotron jumbotron-fluid">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h3>Jumlah Objek: {{ num_objects }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="jumbotron jumbotron-fluid">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h3>After</h3>
+                                <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
+                            </div>
                         </div>
                     </div>
                 </div>

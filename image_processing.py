@@ -23,7 +23,13 @@ def binary_image(threshold_value):
         img_arr, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     new_img = Image.fromarray(binary_img)
     new_img.save("static/img/img_now.jpg")
-
+    
+def count_objects():
+    img = cv2.imread('static/img/img_now.jpg', 0)
+    _, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY_INV)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    num_objects = len(contours)
+    return num_objects
 
 def erosion():
     img = Image.open("static/img/img_now.jpg")

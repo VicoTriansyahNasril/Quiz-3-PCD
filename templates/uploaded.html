@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 p-0" style="overflow-y: auto; height: 100vh;">
+            <!-- Menambahkan overflow-y dan height untuk membuat sidebar dapat di-scroll -->
+            {% set sections = [
+            {'title': 'Umum', 'options': [('normal', 'Normal'), ('grayscale', 'Grayscale'), ('zoomin', 'Zoom In'),
+            ('zoomout', 'Zoom Out')]},
+            {'title': 'Pergeseran', 'options': [('move_left', 'Geser Kiri'), ('move_right', 'Geser Kanan'), ('move_up',
+            'Geser Atas'), ('move_down', 'Geser Bawah')]},
+            {'title': 'Penerangan', 'options': [('brightness_multiplication', 'Terang (*)'), ('brightness_division',
+            'Gelap (/)'), ('brightness_addition', 'Terang(+)'), ('brightness_substraction', 'Gelap (-)')]},
+            {'title': 'Analisis Gambar', 'options': [('histogram_rgb', 'Histogram')]},
+            {'title': 'Pemrosesan Gambar', 'options': [('histogram_equalizer', 'Histogram Equalizer')]},
+            {'title': 'Filter Gambar', 'options': [('edge_detection', 'Edge Detection'), ('blur', 'Blur'),
+            ('sharpening', 'Sharpening')]},
+            {'title': 'Segmentation', 'options': [('thresholding', 'Thresholding')]}
+            ] %}
+            {% for section in sections %}
+            <div class="p-2">
+                <div class="d-flex flex-column">
+                    {% for option in section['options'] %}
+                    <div class="p-2">
+                        <form id="" action="{{ url_for(option[0]) }}" method="POST" enctype="multipart/form-data">
+                            {% if option[0] == 'thresholding' %}
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Batas Bawah</th>
+                                        <th>Batas Atas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" name="lower_thres" placeholder="0-255"
+                                                style="width: 80px;"></td>
+                                        <td><input type="number" name="upper_thres" placeholder="0-255"
+                                                style="width: 80px;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><button type="submit"
+                                                class="btn btn-primary btn-block">Thresholding</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <button type="submit" class="btn btn-primary btn-block">{{ option[1] }}</button>
+                            {% endif %}
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Sidebar end -->
+
+        <!-- Content -->
+        <div class="col-md-10 h-100"> <!-- Menambahkan class h-100 untuk memenuhi tinggi layar -->
+            <div class="jumbotron jumbotron-fluid h-100"> <!-- Menambahkan class h-100 untuk memenuhi tinggi layar -->
+                <div class="container h-100"> <!-- Menambahkan class h-100 untuk memenuhi tinggi layar -->
+                    <div class="row h-100"> <!-- Menambahkan class h-100 untuk memenuhi tinggi layar -->
+                        <div class="col-lg-10">
+                            <h3>After</h3>
+                            <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Content end -->
+    </div>
+</div>
+<style></style>
+{% endblock %}

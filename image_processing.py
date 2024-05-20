@@ -1,9 +1,10 @@
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 from collections import Counter
 import cv2
 from dotenv import set_key, load_dotenv, dotenv_values
+import os
 
 load_dotenv()
 
@@ -74,27 +75,34 @@ def load_chain_codes_from_env():
 
     for key, value in data.items():
         if key.endswith('_chain_code'):
-            emoji_name = key.split('_')[0]
+            emoji_name = key.rsplit('_', 1)[0] 
             chain_code = list(map(int, value.split(',')))
             chain_codes[emoji_name] = chain_code
 
     return chain_codes
 
+
 # Fungsi untuk mengenali emoji dari gambar
 
 
 def recognize_emoji(image_path, chain_codes):
+    # Fungsi untuk mendapatkan chain code dari gambar
     chain_codes_image = get_chain_code_from_image(image_path)
     if chain_codes_image is None:
         return "Unable to recognize emoji. Error reading image."
 
+    # Mencocokkan chain code dari gambar dengan daftar chain codes yang diberikan
     for emoji_name, emoji_chain_code in chain_codes.items():
         if chain_codes_image == emoji_chain_code:
+            # Hilangkan kata 'chain' dari nama emoji jika ada
+            if emoji_name.endswith('chain'):
+                emoji_name = emoji_name[:-5]
             return emoji_name
 
-    # If no match is found, take the full file name without extension as the emoji
-    file_name = image_path.split('/')[-1].split('.')[0]
+    # Jika tidak ada kecocokan, kembalikan nama file lengkap dengan ekstensi
+    file_name = os.path.basename(image_path)
     return file_name
+
 
 # Fungsi untuk mendapatkan Freeman Chain Code dari gambar
 

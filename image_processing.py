@@ -3,6 +3,119 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from collections import Counter
 import cv2
+from dotenv import set_key, load_dotenv, dotenv_values
+
+load_dotenv()
+
+
+def freeman_chain_code(contour):
+    chain_code = []
+    start_point = contour[0][0]
+    current_point = start_point
+
+    for point in contour[1:]:
+        x, y = point[0]
+        dx = x - current_point[0]
+        dy = y - current_point[1]
+        direction = None
+
+        if dx == 1 and dy == 0:
+            direction = 0
+        elif dx == 1 and dy == -1:
+            direction = 1
+        elif dx == 0 and dy == -1:
+            direction = 2
+        elif dx == -1 and dy == -1:
+            direction = 3
+        elif dx == -1 and dy == 0:
+            direction = 4
+        elif dx == -1 and dy == 1:
+            direction = 5
+        elif dx == 0 and dy == 1:
+            direction = 6
+        elif dx == 1 and dy == 1:
+            direction = 7
+
+        if direction is not None:
+            chain_code.append(direction)
+            current_point = (x, y)
+
+    return chain_code
+
+# Fungsi untuk thinning citra
+
+
+def thinning(image):
+    img_arr = np.array(image)
+    size = np.size(img_arr)
+    skel = np.zeros(img_arr.shape, np.uint8)
+    ret, img = cv2.threshold(img_arr, 127, 255, cv2.THRESH_BINARY_INV)
+    element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
+    done = False
+
+    while not done:
+        eroded = cv2.erode(img, element)
+        temp = cv2.dilate(eroded, element)
+        temp = cv2.subtract(img, temp)
+        skel = cv2.bitwise_or(skel, temp)
+        img = eroded.copy()
+        zeros = size - cv2.countNonZero(img)
+        if zeros == size:
+            done = True
+
+    return skel
+
+# Fungsi untuk memuat kode rantai dari file .env
+
+
+def load_chain_codes_from_env():
+    data = dotenv_values(".env")
+    chain_codes = {}
+
+    for key, value in data.items():
+        if key.endswith('_chain_code'):
+            emoji_name = key.split('_')[0]
+            chain_code = list(map(int, value.split(',')))
+            chain_codes[emoji_name] = chain_code
+
+    return chain_codes
+
+# Fungsi untuk mengenali emoji dari gambar
+
+
+def recognize_emoji(image_path, chain_codes):
+    chain_codes_image = get_chain_code_from_image(image_path)
+    if chain_codes_image is None:
+        return "Unable to recognize emoji. Error reading image."
+
+    for emoji_name, emoji_chain_code in chain_codes.items():
+        if chain_codes_image == emoji_chain_code:
+            return emoji_name
+
+    # If no match is found, take the full file name without extension as the emoji
+    file_name = image_path.split('/')[-1].split('.')[0]
+    return file_name
+
+# Fungsi untuk mendapatkan Freeman Chain Code dari gambar
+
+
+def get_chain_code_from_image(image_path):
+    emoji_image = cv2.imread(image_path, 0)
+
+    if emoji_image is None:
+        print("Error membaca gambar")
+        return None
+
+    thin_img = thinning(emoji_image)
+    contours, _ = cv2.findContours(
+        thin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+    total_chain_code = []
+    for contour in contours:
+        chain_code = freeman_chain_code(contour)
+        total_chain_code.extend(chain_code)
+
+    return total_chain_code
 
 
 def grayscale():
@@ -23,27 +136,32 @@ def binary_image(threshold_value):
         img_arr, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     new_img = Image.fromarray(binary_img)
     new_img.save("static/img/img_now.jpg")
-    
+
+
 def count_objects():
     img = cv2.imread('static/img/img_now.jpg', 0)
     _, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY_INV)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(
+        thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     num_objects = len(contours)
     return num_objects
+
 
 def count_square():
     # Baca citra sebagai citra keabuan (grayscale)
     img_gray = cv2.imread('static/img/img_now.jpg', cv2.IMREAD_GRAYSCALE)
-    
+
     # Lakukan thresholding untuk mendapatkan citra biner
-    _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)  # Ubah nilai threshold sesuai kebutuhan
-    
+    # Ubah nilai threshold sesuai kebutuhan
+    _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
+
     # Temukan kontur objek pada citra biner
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+    contours, _ = cv2.findContours(
+        thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
     # Hitung jumlah objek (kontur) yang ditemukan
     num_objects = len(contours)
-    
+
     return num_objects
 
 
@@ -70,12 +188,14 @@ def opening():
     new_img = Image.fromarray(opened_img)
     new_img.save("static/img/img_now.jpg")
 
+
 def closing():
     open_img = Image.open("static/img/img_now.jpg")
     kernel = np.ones((5, 5), np.uint8)
     closed_img = cv2.morphologyEx(np.array(open_img), cv2.MORPH_CLOSE, kernel)
     new_img = Image.fromarray(closed_img)
     new_img.save("static/img/img_now.jpg")
+
 
 def count_shattered_glass():
     img = Image.open("static/img/img_now.jpg").convert('L')

@@ -1,132 +1,227 @@
-{% extends "layout.html" %} 
-{% block body %}
+{% extends "layout.html" %} {% block body %}
 <div class="jumbotron jumbotron-fluid text-center">
-    <h1 class="display-1">Menu</h1>
-    <div class="container">
+  <h1 class="display-1">Menu</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Umum</h2>
+        <div class="d-flex flex-column">
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('normal') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Normal</button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('grayscale') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Grayscale</button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('zoomin') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Zoom In</button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('zoomout') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Zoom Out</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h2>Pergeseran</h2>
+        <div class="d-flex flex-column">
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('move_left') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Geser Kiri</button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('move_right') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Geser Kanan</button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('move_up') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Geser Atas</button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('move_down') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Geser Bawah</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h2>Penerangan</h2>
+        <div class="d-flex flex-column">
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('brightness_multiplication') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">
+                Terang (dengan Perkalian)
+              </button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('brightness_division') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">
+                Gelap (dengan Pembagian)
+              </button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('brightness_addition') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">
+                Terang (dengan Penjumlahan)
+              </button>
+            </form>
+          </div>
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('brightness_substraction') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">
+                Gelap (dengan Pengurangan)
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h2>Analisis Gambar</h2>
+        <div class="d-flex flex-column">
+          <div class="p-2">
+            <form
+              id=""
+              action="{{ url_for('histogram_rgb') }}"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              <button type="submit" class="btn btn-primary">Histogram</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
         <div class="row">
-            <div class="col-md-6">
-                <h2>Umum</h2>
-                <div class="d-flex flex-column">
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('normal') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Normal</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('grayscale') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Grayscale</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('zoomin') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Zoom In</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('zoomout') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Zoom Out</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <h2>Pergeseran</h2>
-                <div class="d-flex flex-column">
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('move_left') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Geser Kiri</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('move_right') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Geser Kanan</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('move_up') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Geser Atas</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('move_down') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Geser Bawah</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <h2>Penerangan</h2>
-                <div class="d-flex flex-column">
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('brightness_multiplication') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Terang (dengan Perkalian)</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('brightness_division') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Gelap (dengan Pembagian)</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('brightness_addition') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Terang (dengan Penjumlahan)</button>
-                        </form>
-                    </div>
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('brightness_substraction') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Gelap (dengan Pengurangan)</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <h2>Analisis Gambar</h2>
-                <div class="d-flex flex-column">
-                    <div class="p-2">
-                        <form id="" action="{{ url_for('histogram_rgb') }}" method="POST" enctype="multipart/form-data">
-                            <button type="submit" class="btn btn-primary">Histogram</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+          {% if file_paths[2] %}
+          <div class="col-md-4">
+            <h3>Image RGB</h3>
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename='img/img_now.jpg') }}"
+              alt="image here"
+            />
+          </div>
+          <div class="col-md-4">
+            <h3>Red Histogram</h3>
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename=file_paths[0]) }}"
+              alt="image here"
+            />
+          </div>
+          <div class="col-md-4">
+            <h3>Green Histogram</h3>
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename=file_paths[1]) }}"
+              alt="image here"
+            />
+          </div>
+          <div class="col-md-4">
+            <h3>Blue Histogram</h3>
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename=file_paths[2]) }}"
+              alt="image here"
+            />
+          </div>
+          {% else %}
+          <div class="col-md-6">
+            <h3>Image Greyscaled</h3>
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename='img/img_now.jpg') }}"
+              alt="image here"
+            />
+          </div>
+          <div class="col-md-6">
+            <h3>Black Histogram</h3>
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename=file_paths[0]) }}"
+              alt="image here"
+            />
+          </div>
+          {% endif %}
         </div>
+      </div>
     </div>
-    <div class="container-fluid">
-        <div class="jumbotron jumbotron-fluid">
-            <div class="container">
-                <div class="row">
-                    {% if file_paths[2] %}
-                    <div class="col-md-4">
-                        <h3>Image RGB</h3>
-                        <img class="img-fluid" src="{{ url_for('static', filename='img/img_now.jpg') }}" alt="image here">
-                    </div>
-                    <div class="col-md-4">
-                        <h3>Red Histogram</h3>
-                        <img class="img-fluid" src="{{ url_for('static', filename=file_paths[0]) }}" alt="image here">
-                    </div>
-                    <div class="col-md-4">
-                        <h3>Green Histogram</h3>
-                        <img class="img-fluid" src="{{ url_for('static', filename=file_paths[1]) }}" alt="image here">
-                    </div>
-                    <div class="col-md-4">
-                        <h3>Blue Histogram</h3>
-                        <img class="img-fluid" src="{{ url_for('static', filename=file_paths[2]) }}" alt="image here">
-                    </div>
-                    {% else %}
-                    <div class="col-md-6">
-                        <h3>Image Greyscaled</h3>
-                        <img class="img-fluid" src="{{ url_for('static', filename='img/img_now.jpg') }}" alt="image here">
-                    </div>
-                    <div class="col-md-6">
-                        <h3>Black Histogram</h3>
-                        <img class="img-fluid" src="{{ url_for('static', filename=file_paths[0]) }}" alt="image here">
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
-<style>
-</style>
+<style></style>
 {% endblock %}

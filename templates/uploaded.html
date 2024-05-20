@@ -1,122 +1,164 @@
-{% extends "layout.html" %}
-{% block body %}
+{% extends "layout.html" %} {% block body %}
 <div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-2 p-0" style="overflow-y: auto; height: 100vh;">
-            <!-- Menambahkan overflow-y dan height untuk membuat sidebar dapat di-scroll -->
-            {% set sections = [
-            {'title': 'Umum', 'options': [('normal', 'Normal'), ('grayscale', 'Grayscale'), ('binary', 'Binary'),
-            ('zoomin', 'Zoom In'), ('zoomout', 'Zoom Out')]},
-            {'title': 'Pergeseran', 'options': [('move_left', 'Geser Kiri'), ('move_right', 'Geser Kanan'), ('move_up',
-            'Geser Atas'), ('move_down', 'Geser Bawah')]},
-            {'title': 'Penerangan', 'options': [('brightness_multiplication', 'Terang (*)'), ('brightness_division',
-            'Gelap (/)'), ('brightness_addition', 'Terang(+)'), ('brightness_substraction', 'Gelap (-)')]},
-            {'title': 'Analisis Gambar', 'options': [('histogram_rgb', 'Histogram')]},
-            {'title': 'Pemrosesan Gambar', 'options': [('histogram_equalizer', 'Histogram Equalizer')]},
-            {'title': 'Filter Gambar', 'options': [('edge_detection', 'Edge Detection'), ('blur', 'Blur'),
-            ('sharpening', 'Sharpening'), ('erosion', 'Erosion'), ('dilation', 'Dilation'), ('opening', 'Opening'),
-            ('closing', 'Closing')]},
-            {'title': 'Segmentation', 'options': [('thresholding', 'Thresholding')]},
-            {'title': 'Ngitung', 'options': [('count', 'Count Shattered Glass'), ('countcell', 'Count Cell(s)'),
-            ('countsquare', 'Count Objects')]}
-            ] %}
-            {% for section in sections %}
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-2 p-0" style="overflow-y: auto; height: 100vh">
+      <!-- Menambahkan overflow-y dan height untuk membuat sidebar dapat di-scroll -->
+      {% set sections = [ {'title': 'Umum', 'options': [('normal', 'Normals'),
+      ('grayscale', 'Grayscale'), ('binary', 'Binary'), ('zoomin', 'Zoom In'),
+      ('zoomout', 'Zoom Out')]}, {'title': 'Pergeseran', 'options':
+      [('move_left', 'Geser Kiri'), ('move_right', 'Geser Kanan'), ('move_up',
+      'Geser Atas'), ('move_down', 'Geser Bawah')]}, {'title': 'Penerangan',
+      'options': [('brightness_multiplication', 'Terang (*)'),
+      ('brightness_division', 'Gelap (/)'), ('brightness_addition',
+      'Terang(+)'), ('brightness_substraction', 'Gelap (-)')]}, {'title':
+      'Analisis Gambar', 'options': [('histogram_rgb', 'Histogram')]}, {'title':
+      'Pemrosesan Gambar', 'options': [('histogram_equalizer', 'Histogram
+      Equalizer')]}, {'title': 'Filter Gambar', 'options': [('edge_detection',
+      'Edge Detection'), ('blur', 'Blur'), ('sharpening', 'Sharpening'),
+      ('erosion', 'Erosion'), ('dilation', 'Dilation'), ('opening', 'Opening'),
+      ('closing', 'Closing')]}, {'title': 'Segmentation', 'options':
+      [('thresholding', 'Thresholding')]}, {'title': 'Ngitung', 'options':
+      [('count', 'Count Shattered Glass'), ('countcell', 'Count Cell(s)'),
+      ('countsquare', 'Count Objects')]}, {'title': 'Deteksi Emoji', 'options':
+      [('recognize', 'Recognize Emoji')]} ] %} {% for section in sections %}
+      <div class="p-2">
+        <div class="d-flex flex-column">
+          <div class="font-weight-bold mb-2">
+            {% if section['options']|length >= 1 %}
+            <a
+              href="#"
+              class="dropdown-toggle text-decoration-none text-dark"
+              data-toggle="collapse"
+              data-target="#{{ section['title'] | replace(' ', '') }}"
+              >{{ section['title'] }}</a
+            >
+            {% else %} {{ section['title'] }} {% endif %}
+          </div>
+          <div
+            class="collapse {% if loop.first %}show{% endif %}"
+            id="{{ section['title'] | replace(' ', '') }}"
+          >
+            {% for option in section['options'] %} {% if option[0] ==
+            'thresholding' %}
             <div class="p-2">
-                <div class="d-flex flex-column">
-                    <div class="font-weight-bold mb-2">
-                        {% if section['options']|length >= 1 %}
-                        <a href="#" class="dropdown-toggle text-decoration-none text-dark" data-toggle="collapse"
-                            data-target="#{{ section['title'] | replace(' ', '') }}">{{ section['title'] }}</a>
-                        {% else %}
-                        {{ section['title'] }}
-                        {% endif %}
-                    </div>
-                    <div class="collapse {% if loop.first %}show{% endif %}"
-                        id="{{ section['title'] | replace(' ', '') }}">
-                        {% for option in section['options'] %}
-                        {% if option[0] == 'thresholding' %}
-                        <div class="p-2">
-                            <form id="" action="{{ url_for(option[0]) }}" method="POST" enctype="multipart/form-data">
-                                <div class="input-group mb-2">
-                                    <input type="number" name="lower_thres" placeholder="Batas Bawah"
-                                        class="form-control" style="width: 80px;">
-                                    <input type="number" name="upper_thres" placeholder="Batas Atas"
-                                        class="form-control" style="width: 80px;">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-primary">Thresholding</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        {% else %}
-                        <div class="p-2">
-                            <form id="" action="{{ url_for(option[0]) }}" method="POST" enctype="multipart/form-data">
-                                <button type="submit" class="sidebar-option btn btn-link">{{ option[1] }}</button>
-                            </form>
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
+              <form
+                id=""
+                action="{{ url_for(option[0]) }}"
+                method="POST"
+                enctype="multipart/form-data"
+              >
+                <div class="input-group mb-2">
+                  <input
+                    type="number"
+                    name="lower_thres"
+                    placeholder="Batas Bawah"
+                    class="form-control"
+                    style="width: 80px"
+                  />
+                  <input
+                    type="number"
+                    name="upper_thres"
+                    placeholder="Batas Atas"
+                    class="form-control"
+                    style="width: 80px"
+                  />
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">
+                      Thresholding
+                    </button>
+                  </div>
                 </div>
+              </form>
             </div>
-            {% endfor %}
+            {% else %}
+            <div class="p-2">
+              <form
+                id=""
+                action="{{ url_for(option[0]) }}"
+                method="POST"
+                enctype="multipart/form-data"
+              >
+                <button type="submit" class="sidebar-option btn btn-link">
+                  {{ option[1] }}
+                </button>
+              </form>
+            </div>
+            {% endif %} {% endfor %}
+          </div>
         </div>
-        <!-- Sidebar end -->
-
-        <!-- Content -->
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="container-fluid">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <h3 class="text-center">Jumlah Objek: {{ num_objects }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <img class="img-fluid mx-auto d-block"
-                                        src="{{ url_for('static', filename=file_path) }}" alt="image here">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>        
-        <!-- Content end -->
+      </div>
+      {% endfor %}
     </div>
+    <!-- Sidebar end -->
+
+    <!-- Content -->
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="container-fluid">
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-12">
+                  <h3 class="text-center">Jumlah Objek: {{ num_objects }}</h3>
+                </div>
+              </div>
+            </div>
+            <!-- Div for Predicted Emoji -->
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="text-center mt-3">
+                    <h4>Predicted Emoji: {{ predicted_emoji }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Image -->
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-12">
+                  <img
+                    class="img-fluid mx-auto d-block"
+                    src="{{ url_for('static', filename=file_path) }}"
+                    alt="image here"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Content end -->
+  </div>
 </div>
 <style>
-    /* Optional: Customize the sidebar appearance */
-    .sidebar-option {
-        text-align: left;
-        padding: 0.5rem 1rem;
-        border: none;
-        background-color: transparent;
-        width: 100%;
-        color: #007bff;
-        transition: all 0.3s;
-    }
+  /* Optional: Customize the sidebar appearance */
+  .sidebar-option {
+    text-align: left;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    color: #007bff;
+    transition: all 0.3s;
+  }
 
-    .sidebar-option:hover {
-        background-color: #f8f9fa;
-        color: #0056b3;
-    }
+  .sidebar-option:hover {
+    background-color: #f8f9fa;
+    color: #0056b3;
+  }
 </style>
 
 <script>
-    // Script to toggle active class on dropdown click
-    document.querySelectorAll('.dropdown-toggle').forEach(function (el) {
-        el.addEventListener('click', function () {
-            const targetId = this.getAttribute('data-target');
-            const targetCollapse = document.querySelector(targetId);
-            targetCollapse.classList.toggle('show');
-        });
-    });
+  // Script to toggle active class on dropdown click
+  document.querySelectorAll(".dropdown-toggle").forEach(function (el) {
+    el.addEventListener("click", function () {
+      const targetId = this.getAttribute("data-target")
+      const targetCollapse = document.querySelector(targetId)
+      targetCollapse.classList.toggle("show")
+    })
+  })
 </script>
 {% endblock %}

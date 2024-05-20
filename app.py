@@ -6,8 +6,11 @@ from flask import Flask, render_template, request, make_response
 from datetime import datetime
 from functools import wraps, update_wrapper
 from shutil import copyfile
+from dotenv import set_key, load_dotenv, dotenv_values
+
 
 app = Flask(__name__)
+load_dotenv()
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -65,6 +68,15 @@ def upload():
     return render_template("uploaded.html", file_path="img/img_now.jpg")
 
 
+@app.route('/recognize', methods=['POST'])
+def recognize():
+    chain_codes = image_processing.load_chain_codes_from_env()
+    image_path = "static/img/img_now.jpg"
+    recognized_emoji = image_processing.recognize_emoji(
+        image_path, chain_codes)
+    return render_template("uploaded.html", predicted_emoji=recognized_emoji, file_path="img/img_now.jpg")
+
+
 @app.route("/normal", methods=["POST"])
 @nocache
 def normal():
@@ -99,6 +111,7 @@ def dilation():
     image_processing.dilation()
     return render_template("uploaded.html", file_path="img/img_now.jpg")
 
+
 @app.route("/opening", methods=["POST"])
 @nocache
 def opening():
@@ -119,17 +132,20 @@ def count():
     num_objects = image_processing.count_shattered_glass()
     return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
 
+
 @app.route("/countsquare", methods=["POST"])
 @nocache
 def countsquare():
     num_objects = image_processing.count_square()
     return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
 
+
 @app.route("/countcell", methods=["POST"])
 @nocache
 def countcell():
     num_objects = image_processing.count_objects()
     return render_template("uploaded.html", num_objects=num_objects, file_path="img/img_now.jpg")
+
 
 @app.route("/zoomin", methods=["POST"])
 @nocache

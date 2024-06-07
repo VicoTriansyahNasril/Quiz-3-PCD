@@ -4,9 +4,64 @@ import matplotlib.pyplot as plt
 from collections import Counter
 import cv2
 from dotenv import set_key, load_dotenv, dotenv_values
+import torch
 import os
 
+
+from transformers import ViTFeatureExtractor, ViTForImageClassification, DetrImageProcessor, DetrForObjectDetection
+from IPython.display import Image, display
+
 load_dotenv()
+
+model = DetrForObjectDetection.from_pretrained('facebook/detr-resnet-50')
+image_processor = DetrImageProcessor.from_pretrained('facebook/detr-resnet-50')
+
+def classify_image(img_path):
+    image = cv2.imread(img_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    feature_extractor = ViTFeatureExtractor.from_pretrained(
+        'google/vit-base-patch16-224')
+    model = ViTForImageClassification.from_pretrained(
+        'google/vit-base-patch16-224')
+
+    inputs = feature_extractor(images=image, return_tensors="pt")
+    outputs = model(**inputs)
+    logits = outputs.logits
+    predicted_class_idx = logits.argmax(-1).item()
+
+    print(predicted_class_idx)
+    print("Predicted class:", model.config.id2label[predicted_class_idx])
+
+
+def detect_objects(image_path, threshold=0.9):
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    inputs = image_processor(images=image, return_tensors="pt")
+    outputs = model(**inputs)
+
+    probas = outputs.logits.softmax(-1)[0, :, :-1]
+    keep = probas.max(-1).values > threshold
+
+    target_sizes = torch.tensor(image.shape[:2]).unsqueeze(0)
+    postprocessed_outputs = image_processor.post_process(
+        outputs, target_sizes)
+    bboxes_scaled = postprocessed_outputs[0]['boxes'][keep]
+    scores = postprocessed_outputs[0]['scores'][keep]
+    labels = postprocessed_outputs[0]['labels'][keep]
+
+    for bbox, score, label in zip(bboxes_scaled, scores, labels):
+        x, y, w, h = bbox.tolist()
+        cv2.rectangle(image, (int(x), int(y)),
+                      (int(w), int(h)), (0, 255, 0), 2)
+
+        class_name = model.config.id2label[label.item()]
+        label_text = f"{class_name}: {score.item():.2f}"
+        cv2.putText(image, label_text, (int(x), int(y) - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+    cv2.imwrite('static/img/img_now.jpg', image)
 
 
 def freeman_chain_code(contour):
@@ -75,7 +130,7 @@ def load_chain_codes_from_env():
 
     for key, value in data.items():
         if key.endswith('_chain_code'):
-            emoji_name = key.rsplit('_', 1)[0] 
+            emoji_name = key.rsplit('_', 1)[0]
             chain_code = list(map(int, value.split(',')))
             chain_codes[emoji_name] = chain_code
 

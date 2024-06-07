@@ -7,6 +7,7 @@ from datetime import datetime
 from functools import wraps, update_wrapper
 from shutil import copyfile
 from dotenv import set_key, load_dotenv, dotenv_values
+import torch
 
 
 app = Flask(__name__)
@@ -75,6 +76,20 @@ def recognize():
     recognized_emoji = image_processing.recognize_emoji(
         image_path, chain_codes)
     return render_template("uploaded.html", predicted_emoji=recognized_emoji, file_path="img/img_now.jpg")
+
+
+@app.route("/imgclass", methods=["POST"])
+@nocache
+def classify():
+    image_processing.classify_image("static/img/img_now.jpg")
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+
+@app.route("/detect_objects", methods=["POST"])
+@nocache
+def detect_objects():
+    image_processing.detect_objects("static/img/img_now.jpg", threshold=0.9)
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
 
 
 @app.route("/normal", methods=["POST"])

@@ -21,7 +21,10 @@
       [('thresholding', 'Thresholding')]}, {'title': 'Ngitung', 'options':
       [('count', 'Count Shattered Glass'), ('countcell', 'Count Cell(s)'),
       ('countsquare', 'Count Objects')]}, {'title': 'Deteksi Emoji', 'options':
-      [('recognize', 'Recognize Emoji')]} ] %} {% for section in sections %}
+      [('recognize', 'Recognize Emoji')]}, {'title': 'Classification',
+      'options': [('classify', 'Image'), ('detect_objects', 'Object Detection'),
+      ('video_classify', 'Video Classification')]} ] %} {% for section in sections
+      %}
       <div class="p-2">
         <div class="d-flex flex-column">
           <div class="font-weight-bold mb-2">
@@ -114,15 +117,25 @@
                 </div>
               </div>
             </div>
-            <!-- Image -->
+            <!-- Image or Video -->
             <div class="container">
               <div class="row">
                 <div class="col-lg-12">
+                  {% if file_type == 'image' %}
                   <img
                     class="img-fluid mx-auto d-block"
                     src="{{ url_for('static', filename=file_path) }}"
                     alt="image here"
                   />
+                  {% elif file_type == 'video' %}
+                  <video controls class="img-fluid mx-auto d-block">
+                    <source
+                      src="{{ url_for('static', filename=file_path) }}"
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
+                  {% endif %}
                 </div>
               </div>
             </div>

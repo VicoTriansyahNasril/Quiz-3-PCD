@@ -8,13 +8,15 @@ import torch
 import os
 
 
-from transformers import ViTFeatureExtractor, ViTForImageClassification, DetrImageProcessor, DetrForObjectDetection
+from transformers import ViTFeatureExtractor, ViTForImageClassification, DetrImageProcessor, DetrForObjectDetection,  VideoMAEFeatureExtractor, VideoMAEForVideoClassification
 from IPython.display import Image, display
+from decord import VideoReader, cpu
 
 load_dotenv()
 
 model = DetrForObjectDetection.from_pretrained('facebook/detr-resnet-50')
 image_processor = DetrImageProcessor.from_pretrained('facebook/detr-resnet-50')
+
 
 def classify_image(img_path):
     image = cv2.imread(img_path)
@@ -62,6 +64,48 @@ def detect_objects(image_path, threshold=0.9):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
     cv2.imwrite('static/img/img_now.jpg', image)
+
+
+def sample_frame_indices(clip_len, frame_sample_rate, seg_len):
+    converted_len = int(clip_len * frame_sample_rate)
+    end_idx = np.random.randint(converted_len, seg_len)
+    str_idx = end_idx - converted_len
+    index = np.linspace(str_idx, end_idx, num=clip_len)
+    index = np.clip(index, str_idx, end_idx - 1).astype(np.int64)
+    return index
+
+
+def classify_video(video_path):
+    # Load the pre-trained VideoMAE model and feature extractor
+    model_name = "MCG-NJU/videomae-base-finetuned-kinetics"
+    feature_extractor = VideoMAEFeatureExtractor.from_pretrained(model_name)
+    model = VideoMAEForVideoClassification.from_pretrained(model_name)
+
+    # Load the video using decord
+    vr = VideoReader(video_path, num_threads=1, ctx=cpu(0))
+
+    # Sample frames from the video
+    vr.seek(0)
+    clip_len = 16
+    frame_sample_rate = 4
+    seg_len = len(vr)
+    index = sample_frame_indices(clip_len, frame_sample_rate, seg_len)
+    buffer = vr.get_batch(index).asnumpy()
+
+    # Preprocess the video frames
+    inputs = feature_extractor(list(buffer), return_tensors="pt")
+
+    # Perform video classification
+    with torch.no_grad():
+        outputs = model(**inputs)
+        predicted_class_idx = outputs.logits.argmax(-1).item()
+        predicted_class = model.config.id2label[predicted_class_idx]
+
+    # Save the predicted class to a text file
+    with open('static/predicted_class.txt', 'w') as f:
+        f.write(predicted_class)
+
+    print("Predicted class:", predicted_class)
 
 
 def freeman_chain_code(contour):

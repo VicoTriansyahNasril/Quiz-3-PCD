@@ -9,7 +9,6 @@ import os
 
 
 from transformers import ViTFeatureExtractor, ViTForImageClassification, DetrImageProcessor, DetrForObjectDetection,  VideoMAEFeatureExtractor, VideoMAEForVideoClassification
-from IPython.display import Image, display
 from decord import VideoReader, cpu
 
 load_dotenv()

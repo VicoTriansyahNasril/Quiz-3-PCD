@@ -114,14 +114,19 @@ def recognize():
 def classify():
     predicted_class, confidence_score = image_processing.classify_image(
         "static/img/img_now.jpg")
-    return render_template("uploaded.html", predicted_class=predicted_class, confidence_score=confidence_score, file_path="img/img_now.jpg", file_type='image')
+    return render_template("uploaded.html",
+                           predicted_class=predicted_class,
+                           confidence_score=confidence_score,
+                           file_path="img/img_now.jpg", file_type='image')
 
 
 @app.route("/detect_objects", methods=["POST"])
 @nocache
 def detect_objects():
     image_processing.detect_objects("static/img/img_now.jpg", threshold=0.9)
-    return render_template("uploaded.html", file_path="img/img_now.jpg", file_type='image')
+    return render_template("uploaded.html",
+                           file_path="img/img_now.jpg",
+                           file_type='image')
 
 
 @app.route("/video_classify", methods=["POST"])
@@ -130,7 +135,10 @@ def video_classify():
     video_path = "static/video/video_now.mp4"
     predicted_class, confidence_score = image_processing.classify_video(
         video_path)
-    return render_template("uploaded.html", predicted_class=predicted_class, confidence_score=confidence_score, file_path="video/video_now.mp4", file_type="video")
+    return render_template("uploaded.html",
+                           predicted_class=predicted_class,
+                           confidence_score=confidence_score,
+                           file_path="video/video_now.mp4", file_type="video")
 
 
 @app.route("/normal", methods=["POST"])

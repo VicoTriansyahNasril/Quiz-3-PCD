@@ -109,11 +109,12 @@ def recognize():
     return render_template("uploaded.html", predicted_emoji=recognized_emoji, file_path="img/img_now.jpg", file_type='image')
 
 
-@app.route("/imgclass", methods=["POST"])
+@app.route("/classify", methods=["POST"])
 @nocache
 def classify():
-    image_processing.classify_image("static/img/img_now.jpg")
-    return render_template("uploaded.html", file_path="img/img_now.jpg", file_type='image')
+    predicted_class, confidence_score = image_processing.classify_image(
+        "static/img/img_now.jpg")
+    return render_template("uploaded.html", predicted_class=predicted_class, confidence_score=confidence_score, file_path="img/img_now.jpg", file_type='image')
 
 
 @app.route("/detect_objects", methods=["POST"])
@@ -127,8 +128,9 @@ def detect_objects():
 @nocache
 def video_classify():
     video_path = "static/video/video_now.mp4"
-    image_processing.classify_video(video_path)
-    return render_template("uploaded.html", file_path="video/video_now.mp4", file_type="video")
+    predicted_class, confidence_score = image_processing.classify_video(
+        video_path)
+    return render_template("uploaded.html", predicted_class=predicted_class, confidence_score=confidence_score, file_path="video/video_now.mp4", file_type="video")
 
 
 @app.route("/normal", methods=["POST"])

@@ -31,14 +31,18 @@ def classify_image(img_path):
     outputs = model(**inputs)
     logits = outputs.logits
     predicted_class_idx = logits.argmax(-1).item()
+    confidence_score = torch.softmax(
+        logits, dim=-1)[0, predicted_class_idx].item()
 
-    print(predicted_class_idx)
-    print("Predicted class:", model.config.id2label[predicted_class_idx])
+    predicted_class = model.config.id2label[predicted_class_idx]
+
+    return predicted_class, confidence_score
 
 
 def detect_objects(image_path, threshold=0.9):
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    height, width, _ = image.shape
 
     inputs = image_processor(images=image, return_tensors="pt")
     outputs = model(**inputs)
@@ -47,20 +51,33 @@ def detect_objects(image_path, threshold=0.9):
     keep = probas.max(-1).values > threshold
 
     target_sizes = torch.tensor(image.shape[:2]).unsqueeze(0)
-    postprocessed_outputs = image_processor.post_process(
-        outputs, target_sizes)
+    postprocessed_outputs = image_processor.post_process(outputs, target_sizes)
     bboxes_scaled = postprocessed_outputs[0]['boxes'][keep]
     scores = postprocessed_outputs[0]['scores'][keep]
     labels = postprocessed_outputs[0]['labels'][keep]
 
     for bbox, score, label in zip(bboxes_scaled, scores, labels):
         x, y, w, h = bbox.tolist()
-        cv2.rectangle(image, (int(x), int(y)),
-                      (int(w), int(h)), (0, 255, 0), 2)
+
+        x = max(0, int(x))
+        y = max(0, int(y))
+        w = min(width, int(w))
+        h = min(height, int(h))
+
+        cv2.rectangle(image, (x, y), (w, h), (0, 255, 0), 2)
 
         class_name = model.config.id2label[label.item()]
         label_text = f"{class_name}: {score.item():.2f}"
-        cv2.putText(image, label_text, (int(x), int(y) - 10),
+
+        label_y = max(15, y - 10)
+
+        label_x = x
+        label_width = cv2.getTextSize(
+            label_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)[0][0]
+        if label_x + label_width > width:
+            label_x = width - label_width
+
+        cv2.putText(image, label_text, (label_x, label_y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
     cv2.imwrite('static/img/img_now.jpg', image)
@@ -76,15 +93,12 @@ def sample_frame_indices(clip_len, frame_sample_rate, seg_len):
 
 
 def classify_video(video_path):
-    # Load the pre-trained VideoMAE model and feature extractor
     model_name = "MCG-NJU/videomae-base-finetuned-kinetics"
     feature_extractor = VideoMAEFeatureExtractor.from_pretrained(model_name)
     model = VideoMAEForVideoClassification.from_pretrained(model_name)
 
-    # Load the video using decord
     vr = VideoReader(video_path, num_threads=1, ctx=cpu(0))
 
-    # Sample frames from the video
     vr.seek(0)
     clip_len = 16
     frame_sample_rate = 4
@@ -92,20 +106,17 @@ def classify_video(video_path):
     index = sample_frame_indices(clip_len, frame_sample_rate, seg_len)
     buffer = vr.get_batch(index).asnumpy()
 
-    # Preprocess the video frames
     inputs = feature_extractor(list(buffer), return_tensors="pt")
 
-    # Perform video classification
     with torch.no_grad():
         outputs = model(**inputs)
-        predicted_class_idx = outputs.logits.argmax(-1).item()
+        logits = outputs.logits
+        predicted_class_idx = logits.argmax(-1).item()
+        confidence_score = torch.softmax(
+            logits, dim=-1)[0, predicted_class_idx].item()
         predicted_class = model.config.id2label[predicted_class_idx]
 
-    # Save the predicted class to a text file
-    with open('static/predicted_class.txt', 'w') as f:
-        f.write(predicted_class)
-
-    print("Predicted class:", predicted_class)
+    return predicted_class, confidence_score
 
 
 def freeman_chain_code(contour):
